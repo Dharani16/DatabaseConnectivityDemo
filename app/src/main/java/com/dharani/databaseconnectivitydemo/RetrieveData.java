@@ -27,6 +27,8 @@ import okhttp3.Response;
 public class RetrieveData extends AppCompatActivity {
 
     TextView tvResult;
+    ListView list;
+    String id,name,address;
     String urlRetrieve = "http://www.silverlightsystems.co.uk/android/json.php";
 
     @Override
@@ -34,17 +36,17 @@ public class RetrieveData extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrieve_data);
         //tvResult = (TextView) findViewById(R.id.txtRetrieve);
-
+        list = (ListView) findViewById(R.id.mylists);
         new RetrieveClass().execute();
 
     }
 
     class RetrieveClass extends AsyncTask<String, Void, String> {
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -73,6 +75,9 @@ public class RetrieveData extends AppCompatActivity {
                     jsondata = response.body().string();
                     Log.d("DATA", jsondata);
                 }
+                else {
+                    Toast.makeText(RetrieveData.this, "Check connection", Toast.LENGTH_SHORT).show();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -82,25 +87,25 @@ public class RetrieveData extends AppCompatActivity {
         @Override
         protected void onPostExecute(String jsondata) {
             //super.onPostExecute(s);
-            ArrayList<String> al = new ArrayList<>();
+           ArrayList<String> al = new ArrayList<>();
+            // String id,name,address;
             try {
                 JSONObject jsonObject = new JSONObject(jsondata);
                 Log.e("JSONObject", "Testing" + jsonObject);
                 JSONArray jsonArray = jsonObject.getJSONArray("result");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject object = jsonArray.getJSONObject(i);
-                    String id = object.getString("id");
-                    String name = object.getString("name");
-                    String address = object.getString("address");
-
+                    id = object.getString("id");
+                    name = object.getString("name");
+                    address = object.getString("address");
                     al.add(id);
-//
-                    //tvResult.setText(id + "\n" + name + "\n" + address);
-                    Toast.makeText(RetrieveData.this, "ID : " + id + "\n" + "Name : " + name, Toast.LENGTH_SHORT).show();
+                    al.add(name);
+                    al.add(address);
+                   //Toast.makeText(RetrieveData.this, "ID : " + id + "\n" + "Name : " + name + "\n" + "Address : "+address, Toast.LENGTH_SHORT).show();
                 }
-                ArrayAdapter<String> madapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, al);
-                ListView l = (ListView) findViewById(R.id.mylists);
-                l.setAdapter(madapter);
+            ListAdapter adapter = new ListAdapter(getApplicationContext(),al);
+            list.setAdapter(adapter);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
